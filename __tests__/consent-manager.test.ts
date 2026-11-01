@@ -132,7 +132,14 @@ describe("ConsentManager", () => {
       manager.registerDecision("server-b", false);
     });
 
-    it("clears specific server", () => {
+    it("clears specific approved and denied servers independently", () => {
+      manager.clear("server-b");
+      expect(manager.requiresPrompt("server-b")).toBe(true);
+      expect(() => manager.ensureApproved("server-b")).toThrow(/approval required/);
+      expect(manager.requiresPrompt("server-a")).toBe(false);
+      expect(() => manager.ensureApproved("server-a")).not.toThrow();
+
+      manager.registerDecision("server-b", false);
       manager.clear("server-a");
       expect(manager.requiresPrompt("server-a")).toBe(true);
       // server-b unchanged
